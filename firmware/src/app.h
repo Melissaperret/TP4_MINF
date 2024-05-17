@@ -60,6 +60,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 
+
+extern bool etatUSB;
+extern bool usbStatSave;
+extern bool FLAG_LCD;
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Type Definitions

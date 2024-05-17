@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "app.h"
+#include "Mc32gest_SerComm.h"
 
 
 // *****************************************************************************
@@ -61,6 +62,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Global Data Definitions
 // *****************************************************************************
 // *****************************************************************************
+
+bool etatUSB = false;
+bool usbStatSave = false;
+bool FLAG_LCD = true;
+S_ParamGen LocalParamGen;
+S_ParamGen RemoteParamGen;
 
 const uint8_t __attribute__((aligned(16))) switchPromptUSB[] = "\r\nPUSH BUTTON PRESSED";
 
@@ -256,12 +263,16 @@ void APP_USBDeviceEventHandler ( USB_DEVICE_EVENT event, void * eventData, uintp
 
             /* VBUS was detected. We can attach the device */
             USB_DEVICE_Attach(appData.deviceHandle);
+            etatUSB = true;
+            FLAG_LCD = true;
             break;
 
         case USB_DEVICE_EVENT_POWER_REMOVED:
 
             /* VBUS is not available any more. Detach the device. */
             USB_DEVICE_Detach(appData.deviceHandle);
+            etatUSB = false;
+            FLAG_LCD = true;
             break;
 
         case USB_DEVICE_EVENT_SUSPENDED:
@@ -438,9 +449,9 @@ void APP_Initialize ( void )
 
 void APP_Tasks (void )
 {
+    int i;
     /* Update the application state machine based
      * on the current state */
-    int i; 
     switch(appData.state)
     {
         case APP_STATE_INIT:
@@ -518,6 +529,8 @@ void APP_Tasks (void )
             if(appData.isReadComplete /*|| appData.isSwitchPressed*/)
             {
                 appData.state = APP_STATE_SCHEDULE_WRITE;
+                GetMessage((int8_t*)appData.readBuffer,&RemoteParamGen, &usbStatSave);
+                FLAG_LCD = true;              
             }
 
             break;
@@ -549,8 +562,10 @@ void APP_Tasks (void )
 //    }
             
                 /* Else echo each received character by adding 1 */ 
-                //envoie de la string reçue à l'autre APP 
+                //envoie de la string reçue à l'autre APP
+        
         APP_GEN_SaveNewStr(appData.readBuffer, appData.numBytesRead);
+        
 
         for(i=0; i<appData.numBytesRead; i++)
         {
@@ -559,11 +574,15 @@ void APP_Tasks (void )
                 appData.readBuffer[i] = appData.readBuffer[i];
             }
         }
+//        APP_Gen_Copy_ReadBuffer(appData.readBuffer,&appData.numBytesRead);
+        FLAG_LCD = true;  
+        SendMessage((int8_t*)appData.readBuffer, &RemoteParamGen, usbStatSave); 
+        
+        
         USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                 &appData.writeTransferHandle,
                 appData.readBuffer, appData.numBytesRead,
-                USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
-   
+                USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);   
 
             break;
 

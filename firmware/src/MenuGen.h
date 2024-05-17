@@ -41,13 +41,13 @@
 //Déclaration des strucures
 
 S_SwitchDescriptor DescrS9;
-S_ParamGen GenParam;
+S_ParamGen LocalParamGen;
 S_ParamGen OldValue;
 
 // Prototype des fonctions 
 
 S_ParamGen MENU_Initialize(S_ParamGen *pParam);
-void MENU_Execute(S_ParamGen *pParam);
+void MENU_Execute(S_ParamGen *pParam, bool local);
 void MENU_SelectMode(S_ParamGen *pParam, int8_t selectModeMenuCounter);
 S_ParamGen MENU_SelectValue(S_ParamGen selectValueNewValue, int8_t selectValueMenuCounter);
 int8_t MENU_SaveValues(S_ParamGen *pParam, int8_t saveValuesMenuCounter);

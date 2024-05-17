@@ -5,14 +5,8 @@
         <group>
             <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/app.c</file>
             <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/MenuGen.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/main.c</file>
             <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/Mc32gest_SerComm.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/app_gen.h</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/DefMenuGen.h</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/Mc32gest_SerComm.h</file>
             <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/app_gen.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/apps/usb/device/cdc_com_port_single_TP4/firmware/src/system_config/pic32mx_usb_sk2_int_dyn/system_interrupt.c</file>
-            <file>file:/C:/microchip/harmony/v2_06/framework/usb/src/dynamic/usb_device.c</file>
         </group>
     </open-files>
 </project-private>

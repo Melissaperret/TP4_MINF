@@ -217,7 +217,8 @@ build/pic32mx_usb_sk2_int_dyn/production/_ext/1360937237/Mc32gest_SerComm.o: \
  ../../../../../../framework/usb/src/usb_device_function_driver.h \
  ../../../../../../framework/usb/usb_cdc.h ../src/app.h ../src/app_gen.h \
  ../src/DefMenuGen.h ../src/Mc32gest_SerComm.h \
- ../src/system_config/chipkit_wf32/system_config.h
+ ../src/system_config/chipkit_wf32/system_config.h \
+ ../src/Mc32gestI2cSeeprom.h
 
 ../src/app.h:
 
@@ -662,3 +663,5 @@ build/pic32mx_usb_sk2_int_dyn/production/_ext/1360937237/Mc32gest_SerComm.o: \
 ../src/Mc32gest_SerComm.h:
 
 ../src/system_config/chipkit_wf32/system_config.h:
+
+../src/Mc32gestI2cSeeprom.h:

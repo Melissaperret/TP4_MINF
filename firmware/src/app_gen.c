@@ -55,12 +55,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "app_gen.h"
 #include "Mc32DriverLcd.h"
-#include "Mc32gestSpiDac.h"
+#include "Mc32gestI2cSeeprom.h"
 #include "GesPec12.h"
 #include "MenuGen.h"
 #include "Generateur.h"
 #include "DefMenuGen.h"
 #include "Mc32gest_SerComm.h"
+#include "app.h"
+#include <string.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -84,6 +86,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 */
 
 APP_GEN_DATA app_genData;
+S_ParamGen LocalParamGen;
+S_ParamGen RemoteParamGen;
+
+bool usbStatSave;
+bool FLAG_LCD;
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -142,7 +150,7 @@ void APP_GEN_Initialize ( void )
 void APP_GEN_Tasks ( void )
 {
     S_ParamGen structInterAPP;    //Déclaration de la variable accueillant temporairement les valeurs de pParam
-    bool savetest = false;
+   
     /* Check the application's current state. */
     switch ( app_genData.state )
     {
@@ -153,21 +161,23 @@ void APP_GEN_Tasks ( void )
             lcd_init();
             //Allumage de la backlight du LCD
             lcd_bl_on();
-            //Initialisation du bus SPI
-            SPI_InitLTC2604();
+            //Initialisation du bus I2C
+            I2C_InitMCP79411();
             //Appel de la fonction d'initialisation du PEC12
             Pec12Init();
             //Appel de la fonction d'initialisation du menu
-            structInterAPP = MENU_Initialize(&GenParam);
+            structInterAPP = MENU_Initialize(&LocalParamGen);
             //Appel de la fonction d'initialisation de gensig
-            GENSIG_Initialize(&GenParam,&structInterAPP);
+            GENSIG_Initialize(&LocalParamGen,&structInterAPP);
             //Appel de la fonction changeant l'amplitude la forme et l'offset du signal
-            GENSIG_UpdateSignal(&GenParam);
+            GENSIG_UpdateSignal(&LocalParamGen);
             //Appel de la fonction changeant la fréquence du signal
-            GENSIG_UpdatePeriode(&GenParam);
+            GENSIG_UpdatePeriode(&LocalParamGen);
             //Démarrage des timers
             DRV_TMR0_Start();
             DRV_TMR1_Start();
+            
+            RemoteParamGen = LocalParamGen; 
             
             APP_Gen_UpdateState(APP_GEN_STATE_WAIT);
             break;
@@ -193,8 +203,8 @@ void APP_GEN_Tasks ( void )
 //                        
 //                    }
 //                    app_genData.strRxReceived = false;
-            GetMessage((int8_t*)app_genData.strRx,&GenParam, &savetest);
-          }
+            
+            
 //            }
                 
             
@@ -205,10 +215,50 @@ void APP_GEN_Tasks ( void )
 //                printf_lcd((char*)app_genData.str);
 //            }
             
-            MENU_Execute(&GenParam);
+            // Contrôle pour checker le fontionnement de l'interruption
+            BSP_LEDToggle(BSP_LED_2);
+            
+            // Execution du menu lorsque nous sommes en USB
+            if(etatUSB == 1)
+            {
+                if(app_genData.strRxReceived == true)
+                {
+                    lcd_bl_on();
+                }
+                else if(Pec12.InactivityDuration >= INACTIVITYDURATIONMAX) 
+                {
+                    lcd_bl_off();
+                }
+                
+                if(FLAG_LCD == true)
+                {
+                  lcd_ClearLine(1);
+                  lcd_ClearLine(2);
+                  lcd_ClearLine(3);
+                  lcd_ClearLine(4);
+                }
+                
+                FLAG_LCD = false;
+                MENU_Execute(&RemoteParamGen, false);
+                GENSIG_UpdateSignal(&RemoteParamGen);
+                
+//                if(GetMessage((int8_t*)app_genData.strRx,&RemoteParamGen, &usbStatSave))
+//                {
+//                   SendMessage((int8_t*)app_genData.strRx, &RemoteParamGen, usbStatSave); 
+//                }  
+                
+                app_genData.strRxReceived = false;
+            }
+            else  // Sinon, execution en mode normal
+            {
+               //Initialisation de notre LCD
+              MENU_Execute(&LocalParamGen, true);
+              
+            }     
+            GENSIG_UpdateSignal(&LocalParamGen);
             APP_Gen_UpdateState(APP_GEN_STATE_WAIT);
             break;
-    
+        }
 
         /* TODO: implement your application state machine.*/
         case APP_GEN_STATE_WAIT:
@@ -225,7 +275,7 @@ void APP_GEN_Tasks ( void )
     }
 }
 
- 
+
 
 /*******************************************************************************
  End of File
@@ -249,3 +299,11 @@ void APP_Gen_UpdateState(APP_GEN_STATES NewState)
     // Aucune sortie explicite, car la mise à jour est effectuée directement sur la variable d'état globale.
     // La fonction n'a pas de valeur de retour (void).
 }
+
+
+//void APP_Gen_Copy_ReadBuffer(uint8_t* copyReadBuffer, uint32_t* tailleMessage)
+//{
+//        *tailleMessage = 32;
+//        memcpy((char*)copyReadBuffer, app_genData.strRx, *tailleMessage);
+//}
+
