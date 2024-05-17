@@ -78,26 +78,27 @@ void I2C_WriteSEEPROM(void *SrcData, uint32_t EEpromAddr, uint16_t NbBytes)
 // Lecture d'un bloc dans l'EEPROM du MCP79411
 void I2C_ReadSEEPROM(void *DstData, uint32_t EEpromAddr, uint16_t NbBytes)
 {
-    uint8_t i;
-    uint8_t *bytePtr = DstData;
-    uint8_t NombreByteMoinsUn = NbBytes - 1;
-    
-   do {
-       i2c_start();
-   }while (!i2c_write(MCP79411_EEPROM_W));
-   
-   i2c_write((uint8_t)EEpromAddr);
-   i2c_reStart();
-   i2c_write(MCP79411_EEPROM_R);
-
-    for(i = 0; i < NombreByteMoinsUn; i++)
+    uint8_t i = 0;
+    uint8_t *i2cData = DstData;
+    // Test si on peut écrire (ACK)
+    do
     {
-        bytePtr[i] = i2c_read(1);
+        i2c_start();
+    }while(!i2c_write(MCP79411_EEPROM_W));
+    // Écriture de l'adresse
+    i2c_write((uint8_t)EEpromAddr);
+    // Restart
+    i2c_reStart();
+    // Demande de lecture
+    i2c_write(MCP79411_EEPROM_R);
+    // Lecture du nombre de Bytes demandés
+    for(i = 0; i < NbBytes - 1; i++)
+    {
+        i2cData[i] = i2c_read(1);
     }
-   
-    bytePtr[i] = i2c_read(0);
-    i2c_stop();     
-    
+    // Finir par une lecture sans ACK
+   i2cData[i] = i2c_read(0);
+   i2c_stop();  // Arret
 } // end I2C_ReadSEEPROM
    
 

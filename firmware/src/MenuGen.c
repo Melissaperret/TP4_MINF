@@ -561,7 +561,7 @@ int8_t MENU_SaveValues(S_ParamGen *pParam, int8_t saveValuesMenuCounter)
                 {
                     //Enregistrement des valeurs de pParam dans la mémoire flash
                     //NVM_WriteBlock((uint32_t*)pParam, sizeof(S_ParamGen));
-                    I2C_WriteSEEPROM((uint32_t*)&pParam, MCP79411_EEPROM_BEG, sizeof(S_ParamGen));
+                    I2C_WriteSEEPROM((uint32_t*)pParam, MCP79411_EEPROM_BEG, sizeof(S_ParamGen));
                     //Effacement des lignes d'affichage de la sauvegarde sur le LCD
                     lcd_ClearLine(2);
                     lcd_ClearLine(3);

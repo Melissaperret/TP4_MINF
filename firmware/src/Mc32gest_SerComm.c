@@ -66,10 +66,10 @@ bool GetMessage(int8_t *USBReadBuffer, S_ParamGen *pParam, bool *SaveTodo)
         pParam->Offset = atoi(pt_Offset+2);
         *SaveTodo = atoi(pt_Sauvegarde+2);
         
-//        if(*SaveTodo == true)
-//        {
-//            I2C_WriteSEEPROM((uint32_t*)&pParam, 0x00, sizeof(S_ParamGen));
-//        }
+        if(*SaveTodo == true)
+        {
+            I2C_WriteSEEPROM((uint32_t*)pParam, 0x00, sizeof(S_ParamGen));
+        }
     }
     return true; 
 } // GetMessage
