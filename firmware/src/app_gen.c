@@ -59,10 +59,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "GesPec12.h"
 #include "MenuGen.h"
 #include "Generateur.h"
-#include "DefMenuGen.h"
 #include "Mc32gest_SerComm.h"
 #include "app.h"
-#include <string.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -186,38 +184,9 @@ void APP_GEN_Tasks ( void )
         
         case APP_GEN_STATE_SERVICE_TASKS:
         {
-//            if (!USB actif)
-//            {
-//                //local
-//            }
-//            else
-//            {
-//                //remote
-//                if( reçu chaine)
-//                {
-//                    
-//                    if (GetMessage(app_genData.strRx) == true)
-//                    {
-//                      //mise à jour du GF
-////                        send message
-//                        
-//                    }
-//                    app_genData.strRxReceived = false;
-            
-            
-//            }
-                
-            
-//            if(app_genData.strReceived)
-//            {
-//                app_genData.strReceived = false;
-//                lcd_gotoxy(1 app_genData.strReceived = false;,4);
-//                printf_lcd((char*)app_genData.str);
-//            }
-            
             // Contrôle pour checker le fontionnement de l'interruption
             BSP_LEDToggle(BSP_LED_2);
-            
+                        
             // Execution du menu lorsque nous sommes en USB
             if(etatUSB == 1)
             {
@@ -239,13 +208,16 @@ void APP_GEN_Tasks ( void )
                 }
                 
                 FLAG_LCD = false;
-                MENU_Execute(&RemoteParamGen, false);
-                GENSIG_UpdateSignal(&RemoteParamGen);
-                
-//                if(GetMessage((int8_t*)app_genData.strRx,&RemoteParamGen, &usbStatSave))
-//                {
-//                   SendMessage((int8_t*)app_genData.strRx, &RemoteParamGen, usbStatSave); 
-//                }  
+                               
+                if(usbStatSave == true)
+                {
+                    MENU_DemandeSave();
+                }
+                else
+                {
+                    MENU_Execute(&RemoteParamGen, false);
+                    GENSIG_UpdateSignal(&RemoteParamGen);
+                }
                 
                 app_genData.strRxReceived = false;
             }
@@ -253,9 +225,9 @@ void APP_GEN_Tasks ( void )
             {
                //Initialisation de notre LCD
               MENU_Execute(&LocalParamGen, true);
-              
+              GENSIG_UpdateSignal(&LocalParamGen);
             }     
-            GENSIG_UpdateSignal(&LocalParamGen);
+            
             APP_Gen_UpdateState(APP_GEN_STATE_WAIT);
             break;
         }
@@ -281,29 +253,111 @@ void APP_GEN_Tasks ( void )
  End of File
  */
 
+// *****************************************************************************
+// Fonction :
+//    void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen)
+//
+// Résumé :
+//    Sauvegarde une nouvelle chaîne de caractères reçue.
+//
+// Description :
+//    Cette fonction marque la réception d'une nouvelle chaîne de caractères,
+//    copie cette chaîne dans le buffer `app_genData.strRx` et s'assure qu'elle
+//    est terminée par un caractère nul ('\0'). Si la longueur de la chaîne
+//    dépasse 31 caractères, elle est bloquée à 31.
+//
+// Paramètres :
+//    - str : Pointeur vers la chaîne de caractères à sauvegarder.
+//    - strLen : Longueur de la chaîne de caractères.
+//
+// Retourne :
+//    - Rien (void).
+// *****************************************************************************
 void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen)
 {
-    app_genData.strRxReceived = true; 
-    if(strLen > 31)
-        strLen = 31; 
-    
+    app_genData.strRxReceived = true;  // Marque la réception d'une nouvelle chaîne
+ 
+    // Si la longueur de la chaîne dépasse 31, elle est tronquée à 31
+    if (strLen > 31)
+        strLen = 31;
+ 
+    // Copie la chaîne dans le buffer `app_genData.strRx`
     memcpy(app_genData.strRx, str, strLen);
-    app_genData.strRx[strLen] = 0; //met la fin de chaine C
+ 
+    // Termine la chaîne par un caractère nul ('\0')
+    app_genData.strRx[strLen] = 0;
 }
 
+// *****************************************************************************
+// Fonction :
+//    void APP_Gen_UpdateState(APP_GEN_STATES NewState)
+//
+// Résumé :
+//    Met à jour l'état de l'application avec une nouvelle valeur.
+//
+// Description :
+//    Cette fonction met à jour l'état de l'application avec la nouvelle valeur
+//    fournie. La mise à jour est effectuée directement sur la variable d'état
+//    globale `app_genData.state`.
+//
+// Paramètres :
+//    - NewState : Nouvelle valeur de l'état de l'application.
+//
+// Retourne :
+//    - Rien (void).
+// *****************************************************************************
 void APP_Gen_UpdateState(APP_GEN_STATES NewState)
 {
     // Met à jour l'état de l'application avec la nouvelle valeur
     app_genData.state = NewState;
-    
-    // Aucune sortie explicite, car la mise à jour est effectuée directement sur la variable d'état globale.
-    // La fonction n'a pas de valeur de retour (void).
 }
 
-
-//void APP_Gen_Copy_ReadBuffer(uint8_t* copyReadBuffer, uint32_t* tailleMessage)
-//{
-//        *tailleMessage = 32;
-//        memcpy((char*)copyReadBuffer, app_genData.strRx, *tailleMessage);
-//}
+// *****************************************************************************
+// Fonction :
+//    void MENU_DemandeSave(void)
+//
+// Résumé :
+//    Affiche un message de confirmation de sauvegarde.
+//
+// Description :
+//    Cette fonction affiche un message de confirmation de sauvegarde sur un écran LCD.
+//    Lors du premier appel, elle efface plusieurs lignes de l'écran. Ensuite, elle
+//    affiche "Sauvegarde OK" pendant un certain nombre d'appels avant de réinitialiser
+//    l'état de sauvegarde.
+//
+// Paramètres :
+//    - Aucun.
+//
+// Retourne :
+//    - Rien (void).
+// *****************************************************************************
+void MENU_DemandeSave(void)
+{
+    static bool compteurPremierPassage = true;  // Indique si c'est le premier passage dans la fonction
+    static uint8_t comptAffichageSauvegarde = 0;  // Compteur pour l'affichage du message de sauvegarde
+    uint8_t indexClearLine = 0;  // Index pour effacer les lignes de l'écran
+ 
+    if (compteurPremierPassage == true)
+    {
+        // Efface les premières lignes de l'écran LCD
+        for (indexClearLine = 0; indexClearLine < 5; indexClearLine++)
+        {
+            lcd_ClearLine(indexClearLine);
+        }
+        compteurPremierPassage = false;  // Marque la fin du premier passage
+    }
+    else if (comptAffichageSauvegarde < 100)
+    {
+        // Affiche "Sauvegarde OK" à une position spécifique sur l'écran LCD
+        lcd_gotoxy(4, 2);
+        printf_lcd("Sauvegarde OK");
+        comptAffichageSauvegarde++;  // Incrémente le compteur d'affichage
+    }
+    else
+    {
+        // Réinitialise le compteur d'affichage et l'état de sauvegarde
+        comptAffichageSauvegarde = 0;
+        usbStatSave = false;
+    }
+}
 

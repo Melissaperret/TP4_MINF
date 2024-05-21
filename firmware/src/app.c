@@ -55,6 +55,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "app.h"
 #include "Mc32gest_SerComm.h"
+#include "app_gen.h"
 
 
 // *****************************************************************************
@@ -66,7 +67,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 bool etatUSB = false;
 bool usbStatSave = false;
 bool FLAG_LCD = true;
-S_ParamGen LocalParamGen;
+
 S_ParamGen RemoteParamGen;
 
 const uint8_t __attribute__((aligned(16))) switchPromptUSB[] = "\r\nPUSH BUTTON PRESSED";
@@ -449,7 +450,7 @@ void APP_Initialize ( void )
 
 void APP_Tasks (void )
 {
-    int i;
+    //int i;
     /* Update the application state machine based
      * on the current state */
     switch(appData.state)
@@ -549,41 +550,18 @@ void APP_Tasks (void )
             appData.isWriteComplete = false;
             appData.state = APP_STATE_WAIT_FOR_WRITE_COMPLETE;
 
-//            if(appData.isSwitchPressed)
-//            {
-//                /* If the switch was pressed, then send the switch prompt*/
-//                appData.isSwitchPressed = false;
-//                USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
-//                        &appData.writeTransferHandle, switchPromptUSB, 23,
-//                        USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);
-//            }
-//            else
-//            {
-//    }
-            
-                /* Else echo each received character by adding 1 */ 
-                //envoie de la string reçue à l'autre APP
+            //envoie de la string reçue à l'autre APP
         
-        APP_GEN_SaveNewStr(appData.readBuffer, appData.numBytesRead);
-        
+            APP_GEN_SaveNewStr(appData.readBuffer, appData.numBytesRead);
 
-        for(i=0; i<appData.numBytesRead; i++)
-        {
-            if((appData.readBuffer[i] != 0x0A) && (appData.readBuffer[i] != 0x0D))
-            {
-                appData.readBuffer[i] = appData.readBuffer[i];
-            }
-        }
-//        APP_Gen_Copy_ReadBuffer(appData.readBuffer,&appData.numBytesRead);
-        FLAG_LCD = true;  
-        SendMessage((int8_t*)appData.readBuffer, &RemoteParamGen, usbStatSave); 
+            SendMessage((int8_t*)appData.readBuffer, &RemoteParamGen, usbStatSave); 
         
         
-        USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
+            USB_DEVICE_CDC_Write(USB_DEVICE_CDC_INDEX_0,
                 &appData.writeTransferHandle,
                 appData.readBuffer, appData.numBytesRead,
                 USB_DEVICE_CDC_TRANSFER_FLAGS_DATA_COMPLETE);   
-
+        
             break;
 
         case APP_STATE_WAIT_FOR_WRITE_COMPLETE:

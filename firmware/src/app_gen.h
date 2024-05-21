@@ -206,7 +206,8 @@ void APP_GEN_Tasks( void );
 void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen);
 
  void APP_Gen_UpdateState(APP_GEN_STATES NewState);
-// void APP_Gen_Copy_ReadBuffer(uint8_t* copyReadBuffer, uint32_t *tailleMessage);
+ void MENU_DemandeSave(void);
+ void APP_Gen_Copy_ReadBuffer(uint8_t* copyReadBuffer, uint32_t *tailleMessage);
 #endif /* _APP_GEN_H */
 
 //DOM-IGNORE-BEGIN
