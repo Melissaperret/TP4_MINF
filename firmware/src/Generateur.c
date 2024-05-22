@@ -195,7 +195,7 @@ void  GENSIG_Execute(void)
    //Déclaration de la variable permettant de connaitre l'échantillon en cours de traitement
    static uint16_t EchNb = 0;
    //Ecriture de l'échantillon dans le DAC via le bus SPI
-   SPI_WriteToDac(0, formeSignal[EchNb] ); 
+   SPI_WriteToDac(0, formeSignal[EchNb]); 
    //Incrémentation de la variable permettant de connaitre l'échantillon en cours de traitement
    EchNb++;
    //Remise à zéro de EchNb quand celui-ci a atteint sa valeur maximale

@@ -15,7 +15,7 @@
 #include "bsp.h"
 #include "DefMenuGen.h"
 #include "Mc32gestI2cSeeprom.h"
-#include "app.h"
+#include "app_gen.h"
 
 //Déclaration du tableau contanant les caractères à afficher pour le paramètre "forme"
     static const char MenuShapes[4][21] = {"Sinus", "Triangle", "DentDeScie", "Carre"};

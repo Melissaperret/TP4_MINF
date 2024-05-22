@@ -61,6 +61,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "Generateur.h"
 #include "Mc32gest_SerComm.h"
 #include "app.h"
+#include "Mc32gestSpiDac.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -84,11 +85,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 */
 
 APP_GEN_DATA app_genData;
+
 S_ParamGen LocalParamGen;
 S_ParamGen RemoteParamGen;
 
 bool usbStatSave;
 bool FLAG_LCD;
+
 
 
 // *****************************************************************************
@@ -161,6 +164,8 @@ void APP_GEN_Tasks ( void )
             lcd_bl_on();
             //Initialisation du bus I2C
             I2C_InitMCP79411();
+            // Init SPI DAC
+            SPI_InitLTC2604();
             //Appel de la fonction d'initialisation du PEC12
             Pec12Init();
             //Appel de la fonction d'initialisation du menu
@@ -217,6 +222,7 @@ void APP_GEN_Tasks ( void )
                 {
                     MENU_Execute(&RemoteParamGen, false);
                     GENSIG_UpdateSignal(&RemoteParamGen);
+                    GENSIG_UpdatePeriode(&RemoteParamGen);
                 }
                 
                 app_genData.strRxReceived = false;
@@ -226,6 +232,7 @@ void APP_GEN_Tasks ( void )
                //Initialisation de notre LCD
               MENU_Execute(&LocalParamGen, true);
               GENSIG_UpdateSignal(&LocalParamGen);
+              GENSIG_UpdatePeriode(&LocalParamGen);
             }     
             
             APP_Gen_UpdateState(APP_GEN_STATE_WAIT);

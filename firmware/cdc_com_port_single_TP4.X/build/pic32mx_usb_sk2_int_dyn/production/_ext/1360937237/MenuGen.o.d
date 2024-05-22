@@ -54,7 +54,7 @@ build/pic32mx_usb_sk2_int_dyn/production/_ext/1360937237/MenuGen.o: \
  ../../../../../../framework/peripheral/tmr/processor/../templates/tmr_CounterAsyncWriteControl_Default.h \
  ../../../../../../framework/peripheral/tmr/processor/../templates/tmr_CounterAsyncWriteInProgress_Default.h \
  ../../../../../../framework/peripheral/tmr/processor/../templates/tmr_TimerOperationMode_Default.h \
- ../src/Mc32gestI2cSeeprom.h ../src/app.h \
+ ../src/Mc32gestI2cSeeprom.h ../src/app_gen.h \
  ../src/system_config/pic32mx_usb_sk2_int_dyn/system_config.h \
  ../src/system_config/pic32mx_usb_sk2_int_dyn/system_definitions.h \
  ../../../../../../framework/system/common/sys_common.h \
@@ -340,7 +340,7 @@ build/pic32mx_usb_sk2_int_dyn/production/_ext/1360937237/MenuGen.o: \
 
 ../src/Mc32gestI2cSeeprom.h:
 
-../src/app.h:
+../src/app_gen.h:
 
 ../src/system_config/pic32mx_usb_sk2_int_dyn/system_config.h:
 

@@ -41,7 +41,6 @@
 //Déclaration des strucures
 
 S_SwitchDescriptor DescrS9;
-S_ParamGen LocalParamGen;
 S_ParamGen OldValue;
 
 // Prototype des fonctions 
