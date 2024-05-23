@@ -212,18 +212,16 @@ void APP_GEN_Tasks ( void )
                   lcd_ClearLine(4);
                 }
                 
-                FLAG_LCD = false;  //Mise du FLAG_LCD à zéro pour ne pas clear les lignes si aucun message n'est reçu 
+                FLAG_LCD = false;  // Mise du FLAG_LCD à zéro pour ne pas clear les lignes si aucun message n'est reçu 
                                
                 if(usbStatSave == true)  //Si une demande de sauvegarde a été effectué, afficher le menu de sauvegarde
                 {
                     MENU_DemandeSave();
                 }
-                else                    //Sinon mettre à jour les signaux
-                {
-                    MENU_Execute(&RemoteParamGen, false);
-                    GENSIG_UpdateSignal(&RemoteParamGen);
-                    GENSIG_UpdatePeriode(&RemoteParamGen);
-                }
+                
+                MENU_Execute(&RemoteParamGen, false);
+                GENSIG_UpdateSignal(&RemoteParamGen);
+                GENSIG_UpdatePeriode(&RemoteParamGen);
                 
                 app_genData.strRxReceived = false;
             }
@@ -366,4 +364,3 @@ void MENU_DemandeSave(void)
         usbStatSave = false;
     }
 }
-
