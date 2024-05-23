@@ -150,7 +150,7 @@ void APP_GEN_Initialize ( void )
 
 void APP_GEN_Tasks ( void )
 {
-    S_ParamGen structInterAPP;    //Déclaration de la variable accueillant temporairement les valeurs de pParam
+    S_ParamGen structInterAPP;    //DÃ©claration de la variable accueillant temporairement les valeurs de pParam
    
     /* Check the application's current state. */
     switch ( app_genData.state )
@@ -174,9 +174,9 @@ void APP_GEN_Tasks ( void )
             GENSIG_Initialize(&LocalParamGen,&structInterAPP);
             //Appel de la fonction changeant l'amplitude la forme et l'offset du signal
             GENSIG_UpdateSignal(&LocalParamGen);
-            //Appel de la fonction changeant la fréquence du signal
+            //Appel de la fonction changeant la frÃ©quence du signal
             GENSIG_UpdatePeriode(&LocalParamGen);
-            //Démarrage des timers
+            //DÃ©marrage des timers
             DRV_TMR0_Start();
             DRV_TMR1_Start();
             
@@ -189,22 +189,22 @@ void APP_GEN_Tasks ( void )
         
         case APP_GEN_STATE_SERVICE_TASKS:
         {
-            // Contrôle pour checker le fontionnement de l'interruption
+            //Toggle de la LED, afin de voir le temps d'interruption
             BSP_LEDToggle(BSP_LED_2);
                         
-            // Execution du menu lorsque nous sommes en USB
+            //Test si l'USB est branchÃ©
             if(etatUSB == 1)
             {
-                if(app_genData.strRxReceived == true)
+                if(app_genData.strRxReceived == true)    //Si une trame est reÃ§u, allumer le back light
                 {
                     lcd_bl_on();
                 }
-                else if(Pec12.InactivityDuration >= INACTIVITYDURATIONMAX) 
+                else if(Pec12.InactivityDuration >= INACTIVITYDURATIONMAX) //Si le Pec12 n'est pas touchÃ© pendant 5 secondes, Ã©teindre le back light
                 {
                     lcd_bl_off();
                 }
                 
-                if(FLAG_LCD == true)
+                if(FLAG_LCD == true)  //Clear les lignes lors de la reception d'un message
                 {
                   lcd_ClearLine(1);
                   lcd_ClearLine(2);
@@ -212,13 +212,13 @@ void APP_GEN_Tasks ( void )
                   lcd_ClearLine(4);
                 }
                 
-                FLAG_LCD = false;
+                FLAG_LCD = false;  //Mise du FLAG_LCD Ã  zÃ©ro pour ne pas clear les lignes si aucun message n'est reÃ§u 
                                
-                if(usbStatSave == true)
+                if(usbStatSave == true)  //Si une demande de sauvegarde a Ã©tÃ© effectuÃ©, afficher le menu de sauvegarde
                 {
                     MENU_DemandeSave();
                 }
-                else
+                else                    //Sinon mettre Ã  jour les signaux
                 {
                     MENU_Execute(&RemoteParamGen, false);
                     GENSIG_UpdateSignal(&RemoteParamGen);
@@ -227,9 +227,8 @@ void APP_GEN_Tasks ( void )
                 
                 app_genData.strRxReceived = false;
             }
-            else  // Sinon, execution en mode normal
+            else  // Si l'USB n'est pas branchÃ©, mettre Ã  jour les signaux avec les paramÃ¨tres locaux
             {
-               //Initialisation de notre LCD
               MENU_Execute(&LocalParamGen, true);
               GENSIG_UpdateSignal(&LocalParamGen);
               GENSIG_UpdatePeriode(&LocalParamGen);
@@ -264,34 +263,34 @@ void APP_GEN_Tasks ( void )
 // Fonction :
 //    void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen)
 //
-// Résumé :
-//    Sauvegarde une nouvelle chaîne de caractères reçue.
+// RÃ©sumÃ© :
+//    Sauvegarde une nouvelle chaÃ®ne de caractÃ¨res reÃ§ue.
 //
 // Description :
-//    Cette fonction marque la réception d'une nouvelle chaîne de caractères,
-//    copie cette chaîne dans le buffer `app_genData.strRx` et s'assure qu'elle
-//    est terminée par un caractère nul ('\0'). Si la longueur de la chaîne
-//    dépasse 31 caractères, elle est bloquée à 31.
+//    Cette fonction marque la rÃ©ception d'une nouvelle chaÃ®ne de caractÃ¨res,
+//    copie cette chaÃ®ne dans le buffer `app_genData.strRx` et s'assure qu'elle
+//    est terminÃ©e par un caractÃ¨re nul ('\0'). Si la longueur de la chaÃ®ne
+//    dÃ©passe 31 caractÃ¨res, elle est bloquÃ©e Ã  31.
 //
-// Paramètres :
-//    - str : Pointeur vers la chaîne de caractères à sauvegarder.
-//    - strLen : Longueur de la chaîne de caractères.
+// ParamÃ¨tres :
+//    - str : Pointeur vers la chaÃ®ne de caractÃ¨res Ã  sauvegarder.
+//    - strLen : Longueur de la chaÃ®ne de caractÃ¨res.
 //
 // Retourne :
 //    - Rien (void).
 // *****************************************************************************
 void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen)
 {
-    app_genData.strRxReceived = true;  // Marque la réception d'une nouvelle chaîne
+    app_genData.strRxReceived = true;  // Marque la rÃ©ception d'une nouvelle chaÃ®ne
  
-    // Si la longueur de la chaîne dépasse 31, elle est tronquée à 31
+    // Si la longueur de la chaÃ®ne dÃ©passe 31, elle est tronquÃ©e Ã  31
     if (strLen > 31)
         strLen = 31;
  
-    // Copie la chaîne dans le buffer `app_genData.strRx`
+    // Copie la chaÃ®ne dans le buffer `app_genData.strRx`
     memcpy(app_genData.strRx, str, strLen);
  
-    // Termine la chaîne par un caractère nul ('\0')
+    // Termine la chaÃ®ne par un caractÃ¨re nul ('\0')
     app_genData.strRx[strLen] = 0;
 }
 
@@ -299,23 +298,23 @@ void APP_GEN_SaveNewStr(uint8_t* str, uint8_t strLen)
 // Fonction :
 //    void APP_Gen_UpdateState(APP_GEN_STATES NewState)
 //
-// Résumé :
-//    Met à jour l'état de l'application avec une nouvelle valeur.
+// RÃ©sumÃ© :
+//    Met Ã  jour l'Ã©tat de l'application avec une nouvelle valeur.
 //
 // Description :
-//    Cette fonction met à jour l'état de l'application avec la nouvelle valeur
-//    fournie. La mise à jour est effectuée directement sur la variable d'état
+//    Cette fonction met Ã  jour l'Ã©tat de l'application avec la nouvelle valeur
+//    fournie. La mise Ã  jour est effectuÃ©e directement sur la variable d'Ã©tat
 //    globale `app_genData.state`.
 //
-// Paramètres :
-//    - NewState : Nouvelle valeur de l'état de l'application.
+// ParamÃ¨tres :
+//    - NewState : Nouvelle valeur de l'Ã©tat de l'application.
 //
 // Retourne :
 //    - Rien (void).
 // *****************************************************************************
 void APP_Gen_UpdateState(APP_GEN_STATES NewState)
 {
-    // Met à jour l'état de l'application avec la nouvelle valeur
+    // Met Ã  jour l'Ã©tat de l'application avec la nouvelle valeur
     app_genData.state = NewState;
 }
 
@@ -323,16 +322,16 @@ void APP_Gen_UpdateState(APP_GEN_STATES NewState)
 // Fonction :
 //    void MENU_DemandeSave(void)
 //
-// Résumé :
+// RÃ©sumÃ© :
 //    Affiche un message de confirmation de sauvegarde.
 //
 // Description :
-//    Cette fonction affiche un message de confirmation de sauvegarde sur un écran LCD.
-//    Lors du premier appel, elle efface plusieurs lignes de l'écran. Ensuite, elle
-//    affiche "Sauvegarde OK" pendant un certain nombre d'appels avant de réinitialiser
-//    l'état de sauvegarde.
+//    Cette fonction affiche un message de confirmation de sauvegarde sur un Ã©cran LCD.
+//    Lors du premier appel, elle efface plusieurs lignes de l'Ã©cran. Ensuite, elle
+//    affiche "Sauvegarde OK" pendant un certain nombre d'appels avant de rÃ©initialiser
+//    l'Ã©tat de sauvegarde.
 //
-// Paramètres :
+// ParamÃ¨tres :
 //    - Aucun.
 //
 // Retourne :
@@ -342,11 +341,11 @@ void MENU_DemandeSave(void)
 {
     static bool compteurPremierPassage = true;  // Indique si c'est le premier passage dans la fonction
     static uint8_t comptAffichageSauvegarde = 0;  // Compteur pour l'affichage du message de sauvegarde
-    uint8_t indexClearLine = 0;  // Index pour effacer les lignes de l'écran
+    uint8_t indexClearLine = 0;  // Index pour effacer les lignes de l'Ã©cran
  
     if (compteurPremierPassage == true)
     {
-        // Efface les premières lignes de l'écran LCD
+        // Efface les premiÃ¨res lignes de l'Ã©cran LCD
         for (indexClearLine = 0; indexClearLine < 5; indexClearLine++)
         {
             lcd_ClearLine(indexClearLine);
@@ -355,14 +354,14 @@ void MENU_DemandeSave(void)
     }
     else if (comptAffichageSauvegarde < 100)
     {
-        // Affiche "Sauvegarde OK" à une position spécifique sur l'écran LCD
+        // Affiche "Sauvegarde OK" Ã  une position spÃ©cifique sur l'Ã©cran LCD
         lcd_gotoxy(4, 2);
         printf_lcd("Sauvegarde OK");
-        comptAffichageSauvegarde++;  // Incrémente le compteur d'affichage
+        comptAffichageSauvegarde++;  // IncrÃ©mente le compteur d'affichage
     }
     else
     {
-        // Réinitialise le compteur d'affichage et l'état de sauvegarde
+        // RÃ©initialise le compteur d'affichage et l'Ã©tat de sauvegarde
         comptAffichageSauvegarde = 0;
         usbStatSave = false;
     }
